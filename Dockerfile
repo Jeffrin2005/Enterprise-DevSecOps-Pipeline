@@ -1,5 +1,5 @@
-# BAD PRACTICE: Using an outdated, insecure base image (Trivy will catch this!)
-FROM node:14-alpine
+# Secure Base Image
+FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
