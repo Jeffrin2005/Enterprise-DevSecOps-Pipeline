@@ -53,7 +53,7 @@ jobs:
       - name: Checkov Kubernetes Scan
         uses: bridgecrewio/checkov-action@master
         with:
-          directory: k8s/
+          directory: devsecops-pipeline/k8s/
           framework: kubernetes
           soft_fail: false # Blocks the build if K8s YAML is insecure
 
