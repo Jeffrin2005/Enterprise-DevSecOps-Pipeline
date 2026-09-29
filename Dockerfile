@@ -1,11 +1,12 @@
 # BAD PRACTICE: Using an outdated, insecure base image (Trivy will catch this!)
-FROM python:3.6-alpine 
+FROM node:14-alpine
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY package*.json ./
+RUN npm install
 
-COPY app.py .
+COPY server.js .
 
-CMD ["python", "app.py"]
+EXPOSE 8080
+CMD [ "npm", "start" ]
