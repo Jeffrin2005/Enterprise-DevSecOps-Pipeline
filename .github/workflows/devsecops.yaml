@@ -19,18 +19,17 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Python Environment
-        uses: actions/setup-python@v4
+      - name: Set up Node.js Environment
+        uses: actions/setup-node@v3
         with:
-          python-version: '3.10'
+          node-version: '18'
 
       - name: Install Dependencies & Run Tests
         run: |
-          echo "Installing pytest..."
-          pip install pytest
+          echo "Installing dependencies..."
+          npm install
           echo "Running Unit Tests..."
-          # dummy test command that will always pass for demonstration
-          pytest || echo "Tests passed successfully!"
+          npm test
 
   # ==========================================
   # STAGE 2: Security Scans (The "Sec" part)
