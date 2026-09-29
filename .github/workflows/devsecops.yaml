@@ -69,3 +69,27 @@ jobs:
           ignore-unfixed: true
           exit-code: '1' # Fails the build if CVEs are found
           severity: 'CRITICAL,HIGH'
+
+  # ==========================================
+  # STAGE 3: Continuous Deployment (CD)
+  # ==========================================
+  deploy:
+    name: Push to DockerHub
+    needs: security-scans # ONLY runs if security scans PASS!
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/my-secure-app:${{ github.sha }}, ${{ secrets.DOCKERHUB_USERNAME }}/my-secure-app:latest
