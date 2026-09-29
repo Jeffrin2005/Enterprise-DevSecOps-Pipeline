@@ -25,10 +25,61 @@ spec:
           {{- end -}}
     spec:
       serviceAccountName: vault-auth # Needed to prove who the pod is
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
       containers:
       - name: app
-        image: nginx:alpine # Just a dummy app for testing
+        image: nginx@sha256:0d17b565c37bcbd895e9d92315a05c1c3c9a29f762b011a10c54a66cd53c9b31
+        imagePullPolicy: Always
         command:
           - "sh"
           - "-c"
           - "sleep 3600" # Keeps the container running so we can look inside
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - ALL
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "true"
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "true"
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: secure-app-network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app: my-secure-app
+  policyTypes:
+  - Ingress
+  - Egress
