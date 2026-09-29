@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-secure-app
+  labels:
+    app: my-secure-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-secure-app
+  template:
+    metadata:
+      labels:
+        app: my-secure-app
+      annotations:
+        # These annotations are where the Vault Magic happens!
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "internal-app"
+        vault.hashicorp.com/agent-inject-secret-database-config.txt: "secret/my-app"
+        # This formats the secret so the app can read it easily
+        vault.hashicorp.com/agent-inject-template-database-config.txt: |
+          {{- with secret "secret/my-app" -}}
+          export DATABASE_PASSWORD="{{ .Data.data.password }}"
+          {{- end -}}
+    spec:
+      serviceAccountName: vault-auth # Needed to prove who the pod is
+      containers:
+      - name: app
+        image: nginx:alpine # Just a dummy app for testing
+        command:
+          - "sh"
+          - "-c"
+          - "sleep 3600" # Keeps the container running so we can look inside

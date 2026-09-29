@@ -1,0 +1,19 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-root-user
+spec:
+  validationFailureAction: enforce # "enforce" means block it! "audit" means just log a warning.
+  background: false
+  rules:
+    - name: validate-runAsNonRoot
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        message: "SECURITY VIOLATION: Running as root is forbidden! You must set runAsNonRoot: true in your securityContext."
+        pattern:
+          spec:
+            securityContext:
+              runAsNonRoot: true
