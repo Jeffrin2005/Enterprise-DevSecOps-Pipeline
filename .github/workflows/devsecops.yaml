@@ -66,5 +66,6 @@ jobs:
         with:
           image-ref: 'my-secure-app:${{ github.sha }}'
           format: 'table'
+          trivyignores: '.trivyignore'
           exit-code: '1' # Fails the build if CVEs are found
           severity: 'CRITICAL,HIGH'
